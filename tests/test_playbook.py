@@ -56,7 +56,7 @@ def test_execute_playbook_success(mock_client):
     mock_client.execute_playbook.return_value = "activity-12345"
     
     state["json_mode"] = False
-    result = runner.invoke(app, ["playbook", "execute", "--id", "100", "--params", '{"ip": "1.1.1.1"}'])
+    result = runner.invoke(app, ["playbook", "execute", "100", "--params", '{"ip": "1.1.1.1"}'])
     assert result.exit_code == 0
     assert "activity-12345" in result.stdout
     
@@ -64,6 +64,6 @@ def test_execute_playbook_success(mock_client):
     mock_client.execute_playbook.assert_called_once_with(100, {"ip": "1.1.1.1"}, 0)
 
 def test_execute_playbook_invalid_json(mock_client):
-    result = runner.invoke(app, ["playbook", "execute", "--id", "100", "--params", 'invalid-json'])
+    result = runner.invoke(app, ["playbook", "execute", "100", "--params", 'invalid-json'])
     assert result.exit_code == 1
     assert "Invalid JSON" in result.stdout

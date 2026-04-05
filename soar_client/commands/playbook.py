@@ -106,7 +106,7 @@ def search_playbooks(query: str = typer.Argument(..., help="Text to search in pl
         raise typer.Exit(code=1)
 
 @app.command("params")
-def playbook_params(playbook_id: int = typer.Option(..., "--id", help="The ID of the playbook")):
+def playbook_params(playbook_id: int = typer.Argument(..., help="The ID of the playbook")):
     """
     Get the required parameters for a specific playbook.
     """
@@ -152,7 +152,7 @@ def playbook_params(playbook_id: int = typer.Option(..., "--id", help="The ID of
 
 @app.command("execute")
 def execute(
-    playbook_id: int = typer.Option(..., "--id", help="The ID of the playbook to run"),
+    playbook_id: int = typer.Argument(..., help="The ID of the playbook to run"),
     params: str = typer.Option("{}", "--params", help="JSON string representing the parameters"),
     event_id: int = typer.Option(0, "--event-id", help="Optional Event ID to bind this execution to")
 ):
@@ -174,7 +174,7 @@ def execute(
         else:
             console.print(f"[green]Successfully started execution for Playbook {playbook_id}[/green]")
             console.print(f"Activity ID: [bold cyan]{activity_id}[/bold cyan]")
-            console.print(f"To check status: [yellow]soar-cli playbook status --exec-id {activity_id}[/yellow]")
+            console.print(f"To check status: [yellow]soar-cli playbook status {activity_id}[/yellow]")
             
     except Exception as e:
         from soar_client.main import print_result
@@ -182,7 +182,7 @@ def execute(
         raise typer.Exit(code=1)
 
 @app.command("status")
-def status(exec_id: str = typer.Option(..., "--exec-id", help="The Activity ID returned from run")):
+def status(activity_id: str = typer.Argument(..., help="The Activity ID returned from execute")):
     """
     Check the status of a playbook execution.
     """
@@ -194,7 +194,7 @@ def status(exec_id: str = typer.Option(..., "--exec-id", help="The Activity ID r
         from soar_client.main import print_result, console, state
         if state["json_mode"]:
             print_result({
-                "activityId": exec_id,
+                "activityId": activity_id,
                 "status": exec_status,
                 "details": status_data
             })
@@ -202,25 +202,24 @@ def status(exec_id: str = typer.Option(..., "--exec-id", help="The Activity ID r
             color = "green" if exec_status == "SUCCESS" else "yellow" if exec_status == "RUNNING" else "red"
             console.print(f"Execution Status: [bold {color}]{exec_status}[/bold {color}]")
             
-            if exec_status == "SUCCESS":
-                console.print(f"To see results: [yellow]soar playbook result --exec-id {exec_id}[/yellow]")
+            console.print(f"To see results: [yellow]soar-cli playbook result {activity_id}[/yellow]")
     except Exception as e:
         from soar_client.main import print_result
         print_result(f"Status check failed: {e}", success=False)
         raise typer.Exit(code=1)
 
 @app.command("result")
-def result(exec_id: str = typer.Option(..., "--exec-id", help="The Activity ID returned from run")):
+def result(activity_id: str = typer.Argument(..., help="The Activity ID returned from execute")):
     """
     Fetch the detailed results of a playbook execution.
     """
     client = get_client()
     try:
-        result_data = client.get_execution_result(exec_id)
+        result_data = client.get_execution_result(activity_id)
         
         from soar_client.main import print_result, console, state
         if state["json_mode"]:
-            print_result({"activityId": exec_id, "result": result_data})
+            print_result({"activityId": activity_id, "result": result_data})
         else:
             # We dump the raw result structure back 
             console.print("Execution Result Data:")

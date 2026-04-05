@@ -20,6 +20,22 @@ class SOARClient:
             "hg-token": self.token,
             "Content-Type": "application/json"
         }
+        
+    def _check_response(self, response: httpx.Response, entity_name: str = "Resource"):
+        if response.status_code >= 400:
+            msg = response.text
+            try:
+                err_data = response.json()
+                msg = err_data.get("message") or err_data.get("msg") or msg
+            except Exception:
+                pass
+            
+            if response.status_code == 404:
+                raise Exception(f"{entity_name} 不存在 (404 Not Found)。详细信息: {msg}")
+            elif response.status_code == 400:
+                raise Exception(f"请求参数错误 (400 Bad Request)。详细信息: {msg}")
+            else:
+                raise Exception(f"API 请求失败 ({response.status_code}): {msg}")
 
     def _get_client(self) -> httpx.Client:
         # Use a synchronous client for simplicity in the CLI, unless async is heavily required
@@ -37,7 +53,7 @@ class SOARClient:
         
         with self._get_client() as client:
             response = client.post(url, json=payload)
-            response.raise_for_status()
+            self._check_response(response, "Playbook List")
             data = response.json()
             
             if data.get("code") != 200:
@@ -53,7 +69,7 @@ class SOARClient:
         url = f"{self.base_url.rstrip('/')}/api/playbook/param?playbookId={playbook_id}"
         with self._get_client() as client:
             response = client.post(url)
-            response.raise_for_status()
+            self._check_response(response, "Playbook")
             data = response.json()
             
             if data.get("code") != 200:
@@ -74,7 +90,7 @@ class SOARClient:
         
         with self._get_client() as client:
             response = client.post(url, json=payload)
-            response.raise_for_status()
+            self._check_response(response, "Playbook (Execute)")
             data = response.json()
             
             if data.get("code") != 200:
@@ -91,7 +107,7 @@ class SOARClient:
         
         with self._get_client() as client:
             response = client.get(url)
-            response.raise_for_status()
+            self._check_response(response, "Activity")
             data = response.json()
             
             if data.get("code") != 200:
@@ -104,7 +120,7 @@ class SOARClient:
         
         with self._get_client() as client:
             response = client.get(url)
-            response.raise_for_status()
+            self._check_response(response, "Activity Result")
             data = response.json()
             
             if data.get("code") != 200:

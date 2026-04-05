@@ -1,4 +1,4 @@
-# Soar-CLI
+# SOAR-CLI
 
 **soar-cli** 是一个专为人类操作和 AI Agent 自动化集成设计的轻量级命令行工具，旨在便捷地对接和调用编排自动化产品 OctoMation / HoneyGuide SOAR，执行安全剧本（Playbook）。
 
@@ -41,10 +41,13 @@ soar-cli playbook list
 soar-cli playbook search "暴力破解"
 
 # 执行某个设定的剧本并赋予配置参数
-soar-cli playbook execute --id 123 --params '{"ip": "1.1.1.1"}'
+soar-cli playbook execute 123 --params '{"ip": "1.1.1.1"}'
 
 # 检查执行进度或状态
-soar-cli playbook status --exec-id xyz-123
+soar-cli playbook status xyz-123
+
+# 拉取执行结果
+soar-cli playbook result xyz-123
 ```
 
 ## 🤖 使用方法 (Agent/大模型 严格 JSON 模式)
@@ -53,5 +56,6 @@ soar-cli playbook status --exec-id xyz-123
 
 ```bash
 soar-cli --json playbook list
-soar-cli --json playbook execute --id 123 --params '{"ip":"1.1.1.1"}'
+soar-cli --json playbook execute 123 --params '{"ip":"1.1.1.1"}'
+soar-cli --json playbook result xyz-123
 ```
