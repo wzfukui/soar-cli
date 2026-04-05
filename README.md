@@ -7,7 +7,7 @@ Perfect for humans in terminal, and incredibly native for AI Agents with `--json
 ## Installation
 
 ```bash
-cd /opt/code/chris/SuperBody/dev/soar_cli
+cd /opt/soar_cli
 # Optional but recommended: create a venv
 python3 -m venv venv
 source venv/bin/activate
