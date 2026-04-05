@@ -188,7 +188,7 @@ def status(activity_id: str = typer.Argument(..., help="The Activity ID returned
     """
     client = get_client()
     try:
-        status_data = client.get_execution_status(exec_id)
+        status_data = client.get_execution_status(activity_id)
         exec_status = status_data.get('executeStatus', 'UNKNOWN')
         
         from soar_client.main import print_result, console, state

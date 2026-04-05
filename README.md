@@ -1,5 +1,7 @@
 # Soar-CLI
 
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+
 **soar-cli** 是一个专为人类操作和 AI Agent 自动化集成设计的轻量级命令行工具，旨在便捷地对接和调用编排自动化产品 OctoMation / HoneyGuide SOAR，执行安全剧本（Playbook）。
 
 本开源项目由 **[上海雾帜智能科技有限公司 (flagify.com)](https://flagify.com/)** 提供技术支持。
@@ -37,33 +39,28 @@ cp .env.example .env
 
 ```bash
 > soar-cli playbook search "暴力破解处置剧本_云上"
-                   Search Results for '暴力破解处置剧本_云上'                   
-┏━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
-┃               ID ┃ Display Name                ┃ Description                 ┃
-┡━━━━━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┩
-│ 1907203516548373 │ 暴力破解处置剧本_云上       │ 暴力破解处置剧本_云上       │
-...
-└──────────────────┴─────────────────────────────┴─────────────────────────────┘
+
+![Playbook Search Result](assets/playbook_search.png)
 
 > soar-cli playbook params 1907203516548373
-                   Parameters for Playbook 1907203516548373                    
-┏━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━┳━━━━━━━━━━┓
-┃ Parameter Name ┃ Description                            ┃ Type   ┃ Required ┃
-┡━━━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╇━━━━━━━━╇━━━━━━━━━━┩
-│ src            │ 正在参与暴力破解的攻击者IP地址（单个） │ STRING │   Yes    │
-└────────────────┴────────────────────────────────────────┴────────┴──────────┘
 
-> soar-cli playbook execute 123 --params '{"src": "66.240.205.34"}'
-Error: Execution failed: 请求参数错误 (400 Bad Request)。详细信息: 剧本不存在
+![Playbook Params Result](assets/playbook_params.png)
 
 > soar-cli playbook execute 1907203516548373 --params '{"src": "66.240.205.34"}'
+
 Successfully started execution for Playbook 1907203516548373
-Activity ID: 15bf7f98-eb9d-4ea0-bcf8-7ebb39a379b9
-To check status: soar-cli playbook status 15bf7f98-eb9d-4ea0-bcf8-7ebb39a379b9
+Activity ID: 898e7d68-5389-4055-8e37-6124dd2c0a17
+To check status: soar-cli playbook status 898e7d68-5389-4055-8e37-6124dd2c0a17
+
 
 > soar-cli playbook status 15bf7f98-eb9d-4ea0-bcf8-7ebb39a379b9
+
 Execution Status: WAITING_APPROVE
 To see results: soar-cli playbook result 15bf7f98-eb9d-4ea0-bcf8-7ebb39a379b9
+
+> soar-cli playbook result 15bf7f98-eb9d-4ea0-bcf8-7ebb39a379b9
+
+![Playbook Result Output](assets/playbook_result.png)
 ```
 
 ## 🤖 使用方法 (Agent/大模型 严格 JSON 模式)
@@ -77,3 +74,27 @@ soar-cli --json playbook execute 1907203516548373 --params '{"src":"66.240.205.3
 soar-cli --json playbook status 15bf7f98-eb9d-4ea0-bcf8-7ebb39a379b9
 soar-cli --json playbook result 15bf7f98-eb9d-4ea0-bcf8-7ebb39a379b9
 ```
+
+部分结果示例：
+
+```json
+{
+  "success": true,
+  "data": {
+    "playbookId": 1907203516548373,
+    "params": [
+      {
+        "paramName": "src",
+        "paramDesc": "正在参与暴力破解的攻击者IP地址（单个）",
+        "paramType": "STRING",
+        "required": true
+      }
+    ]
+  }
+}
+```
+
+---
+
+## 📜 协议 (License)
+本项目遵守 [MIT License](LICENSE) 开源协议，允许自由使用、修改及商用集成。由于它被设计为连接核心编排平台 OctoMation 的纯端侧脚手架，请放心分发与扩展！
