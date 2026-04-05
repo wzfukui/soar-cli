@@ -1,4 +1,4 @@
-# SOAR-CLI
+# Soar-CLI
 
 **soar-cli** 是一个专为人类操作和 AI Agent 自动化集成设计的轻量级命令行工具，旨在便捷地对接和调用编排自动化产品 OctoMation / HoneyGuide SOAR，执行安全剧本（Playbook）。
 
@@ -32,22 +32,38 @@ pip install -e .
 cp .env.example .env
 ```
 
-## 👩‍💻 使用方法 (人类模式)
-人类模式下，CLI 终端会自动渲染彩色的 ASCII 数据表，方便直观查看数据。
+## 👩‍💻 使用方法示例 (人类模式)
+人类模式下，CLI 终端会自动渲染排列整齐的 ASCII 数据表，如果遇到缺失请求或 ID 不存在，会自动捕捉后台错误并给予明确的中文提示。
 
 ```bash
-soar-cli playbook --help
-soar-cli playbook list
-soar-cli playbook search "暴力破解"
+> soar-cli playbook search "暴力破解处置剧本_云上"
+                   Search Results for '暴力破解处置剧本_云上'                   
+┏━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
+┃               ID ┃ Display Name                ┃ Description                 ┃
+┡━━━━━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┩
+│ 1907203516548373 │ 暴力破解处置剧本_云上       │ 暴力破解处置剧本_云上       │
+...
+└──────────────────┴─────────────────────────────┴─────────────────────────────┘
 
-# 执行某个设定的剧本并赋予配置参数
-soar-cli playbook execute 123 --params '{"ip": "1.1.1.1"}'
+> soar-cli playbook params 1907203516548373
+                   Parameters for Playbook 1907203516548373                    
+┏━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━┳━━━━━━━━━━┓
+┃ Parameter Name ┃ Description                            ┃ Type   ┃ Required ┃
+┡━━━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╇━━━━━━━━╇━━━━━━━━━━┩
+│ src            │ 正在参与暴力破解的攻击者IP地址（单个） │ STRING │   Yes    │
+└────────────────┴────────────────────────────────────────┴────────┴──────────┘
 
-# 检查执行进度或状态
-soar-cli playbook status xyz-123
+> soar-cli playbook execute 123 --params '{"src": "66.240.205.34"}'
+Error: Execution failed: 请求参数错误 (400 Bad Request)。详细信息: 剧本不存在
 
-# 拉取执行结果
-soar-cli playbook result xyz-123
+> soar-cli playbook execute 1907203516548373 --params '{"src": "66.240.205.34"}'
+Successfully started execution for Playbook 1907203516548373
+Activity ID: 15bf7f98-eb9d-4ea0-bcf8-7ebb39a379b9
+To check status: soar-cli playbook status 15bf7f98-eb9d-4ea0-bcf8-7ebb39a379b9
+
+> soar-cli playbook status 15bf7f98-eb9d-4ea0-bcf8-7ebb39a379b9
+Execution Status: WAITING_APPROVE
+To see results: soar-cli playbook result 15bf7f98-eb9d-4ea0-bcf8-7ebb39a379b9
 ```
 
 ## 🤖 使用方法 (Agent/大模型 严格 JSON 模式)
@@ -55,7 +71,9 @@ soar-cli playbook result xyz-123
 所有终端富文本和交互输出会被立即屏蔽，仅输出严格的、可解析的 JSON 对象。
 
 ```bash
-soar-cli --json playbook list
-soar-cli --json playbook execute 123 --params '{"ip":"1.1.1.1"}'
-soar-cli --json playbook result xyz-123
+soar-cli --json playbook search "暴力破解处置剧本_云上"
+soar-cli --json playbook params 1907203516548373
+soar-cli --json playbook execute 1907203516548373 --params '{"src":"66.240.205.34"}'
+soar-cli --json playbook status 15bf7f98-eb9d-4ea0-bcf8-7ebb39a379b9
+soar-cli --json playbook result 15bf7f98-eb9d-4ea0-bcf8-7ebb39a379b9
 ```
