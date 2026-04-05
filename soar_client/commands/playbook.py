@@ -15,6 +15,18 @@ def get_client() -> SOARClient:
         print_result(str(e), success=False)
         raise typer.Exit(code=1)
 
+def extract_text_from_draftjs(description: str) -> str:
+    """Extracts plain text from DraftJS format (raw JSON) often found in playbooks."""
+    if not description:
+        return ""
+    try:
+        data = json.loads(description)
+        if "blocks" in data and isinstance(data["blocks"], list):
+            return " ".join(block.get("text", "") for block in data["blocks"])
+    except (json.JSONDecodeError, TypeError):
+        pass
+    return description
+
 @app.command("list")
 def list_playbooks(category: Optional[str] = typer.Option(None, help="Filter by playbook category")):
     """
@@ -27,7 +39,7 @@ def list_playbooks(category: Optional[str] = typer.Option(None, help="Filter by 
         from soar_client.main import state, print_result, console
         if state["json_mode"]:
             # Reduce fields
-            formatted = [{"id": p.get("id"), "name": p.get("name"), "displayName": p.get("displayName"), "description": p.get("description")} for p in playbooks]
+            formatted = [{"id": p.get("id"), "name": p.get("name"), "displayName": p.get("displayName"), "description": extract_text_from_draftjs(p.get("description", ""))} for p in playbooks]
             print_result({"total": len(playbooks), "playbooks": formatted})
         else:
             table = Table(title="SOAR Playbooks")
@@ -85,7 +97,7 @@ def search_playbooks(query: str = typer.Argument(..., help="Text to search in pl
                 table.add_row(
                     str(p.get("id", "")),
                     p.get("displayName", ""),
-                    p.get("description", "N/A")
+                    extract_text_from_draftjs(p.get("description", "N/A"))
                 )
             console.print(table)
     except Exception as e:
