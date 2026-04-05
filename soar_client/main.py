@@ -24,12 +24,25 @@ console = Console()
 # This is extremely useful for Agent execution parsing
 state = {"json_mode": False}
 
+def version_callback(value: bool):
+    if value:
+        from soar_client import __version__
+        typer.echo(f"soar-cli version: {__version__}")
+        raise typer.Exit()
+
 @app.callback()
 def main(
     output_json: bool = typer.Option(
         False, 
         "--json", "-j", 
         help="Enable JSON output mode for Agent parsers"
+    ),
+    version: bool = typer.Option(
+        None,
+        "--version", "-v",
+        callback=version_callback,
+        is_eager=True,
+        help="Show the application's version and exit."
     )
 ):
     """
